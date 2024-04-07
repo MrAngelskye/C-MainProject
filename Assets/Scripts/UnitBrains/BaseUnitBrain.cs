@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Model;
 using Model.Runtime.Projectiles;
@@ -31,7 +32,7 @@ namespace UnitBrains
             new (-0.15f, -0.15f),
         };
 
-        public virtual Vector2Int GetNextStep()
+        public virtual Vector2Int GetNextStep(UnityEngine.UIElements.Position position)
         {
             if (HasTargetsInRange())
                 return unit.Pos;
@@ -162,6 +163,11 @@ namespace UnitBrains
             }
 
             return result;
+        }
+
+        internal Vector2Int GetNextStep(object position)
+        {
+            throw new NotImplementedException();
         }
     }
 }

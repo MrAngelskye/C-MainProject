@@ -41,7 +41,7 @@ namespace UnitBrains.Player
             ///////////////////////////////////////
         }
 
-        public override Vector2Int GetNextStep()
+        public override Vector2Int GetNextStep(UnityEngine.UIElements.Position position)
         {
             Vector2Int Position = Vector2Int.zero;
             Vector2Int nextPosition = Vector2Int.right;

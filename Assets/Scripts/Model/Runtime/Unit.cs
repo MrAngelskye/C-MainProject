@@ -6,6 +6,7 @@ using Model.Runtime.ReadOnly;
 using UnitBrains;
 using UnitBrains.Pathfinding;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Utilities;
 
 namespace Model.Runtime
@@ -26,7 +27,8 @@ namespace Model.Runtime
         private float _nextBrainUpdateTime = 0f;
         private float _nextMoveTime = 0f;
         private float _nextAttackTime = 0f;
-        
+        private Position position;
+
         public Unit(UnitConfig config, Vector2Int startPos)
         {
             Config = config;
@@ -72,7 +74,7 @@ namespace Model.Runtime
 
         private void Move()
         {
-            var targetPos = _brain.GetNextStep(Position);
+            var targetPos = _brain.GetNextStep(position);
             var delta = targetPos - Pos;
             if (delta.sqrMagnitude > 2)
             {
