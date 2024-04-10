@@ -18,6 +18,9 @@ namespace UnitBrains.Player
         private float _temperature = 0f;
         private float _cooldownTime = 0f;
         private bool _overheated;
+        private static int unitCounter = 0;
+        private int unitNumber;
+        private const int MaxTargetsToConsider = 3;
 
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
         {
@@ -63,18 +66,29 @@ namespace UnitBrains.Player
             ///////////////////////////////////////
             // Homework 1.4 (1st block, 4rd module)
             ///////////////////////////////////////
-            List<Vector2Int> result = GetReachableTargets();
-            List<Vector2Int> allTargets = new List<Vector2Int>();
+            List<Vector2Int> allTargets = GetReachableTargets();
+            List<Vector2Int> result = new List<Vector2Int>();
 
             Vector2Int Target = Vector2Int.zero;
 
 
 
-            if (new List<Vector2Int>().Count == 0)
-                if (new List<Vector2Int>().Count == 1)
+            if (allTargets.Count == 0)
+            {
+                int playerID = IsPlayerUnitBrain ? RuntimeModel.PlayerId : RuntimeModel.BotPlayerId;
+                result.Add(runtimeModel.RoMap.Bases[playerID]);
+            }
+            else
+            {
+                SortByDistanceToOwnBase(allTargets);
+                unitCounter++;
+                unitNumber = unitCounter;
+                int targetIndex = unitNumber % Math.Min(allTargets.Count, MaxTargetsToConsider);
+                if (IsTargetInRange(allTargets[targetIndex]))
                 {
-                    return new List<Vector2Int>();
+                    result.Add(allTargets[targetIndex]);
                 }
+            }
 
             //Макс. значение расстояния
             float minDistance = float.MaxValue;
@@ -109,7 +123,7 @@ namespace UnitBrains.Player
 
             new List<Vector2Int>().Clear();
             new List<Vector2Int>().Add(Target);
-            return new List<Vector2Int>();
+            return result;
         }
 
         public override void Update(float deltaTime, float time)
