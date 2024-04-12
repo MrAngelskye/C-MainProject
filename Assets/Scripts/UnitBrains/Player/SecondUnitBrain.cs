@@ -36,29 +36,14 @@ namespace UnitBrains.Player
             IncreaseTemperature();
 
 
-            for (int a = 0; a < GetTemperature(); a++)
+
+
+            if (IsTargetInRange(forTarget))
             {
                 var projectile = CreateProjectile(forTarget);
                 AddProjectileToList(projectile, intoList);
             }
             ///////////////////////////////////////
-        }
-
-        public override Vector2Int GetNextStep(UnityEngine.UIElements.Position position)
-        {
-            Vector2Int Position = Vector2Int.zero;
-            Vector2Int nextPosition = Vector2Int.right;
-            Position = Position.CalcNextStepTowards(nextPosition);
-
-            List<Vector2Int> targets = SelectTargets();
-            if (targets.Count == 0 || IsTargetInRange(targets[0]))
-            {
-                return Position;
-            }
-            else
-            {
-                return targets[0];
-            }
         }
 
         protected override List<Vector2Int> SelectTargets()
@@ -71,12 +56,15 @@ namespace UnitBrains.Player
 
             Vector2Int Target = Vector2Int.zero;
 
+            int playerID = IsPlayerUnitBrain ? RuntimeModel.PlayerId : RuntimeModel.BotPlayerId;
+            Vector2Int ownBase = runtimeModel.RoMap.Bases[playerID];
 
+            int enemyPlayerID = 1 - playerID;
+            Vector2Int enemyBase = runtimeModel.RoMap.Bases[enemyPlayerID];
 
             if (allTargets.Count == 0)
             {
-                int playerID = IsPlayerUnitBrain ? RuntimeModel.PlayerId : RuntimeModel.BotPlayerId;
-                result.Add(runtimeModel.RoMap.Bases[playerID]);
+                result.Add(enemyBase);
             }
             else
             {
@@ -116,7 +104,7 @@ namespace UnitBrains.Player
                     else
                     {
                         int palyerID = IsPlayerUnitBrain ? RuntimeModel.PlayerId : RuntimeModel.BotPlayerId;
-                        Vector2Int enemyBase = runtimeModel.RoMap.Bases[palyerID];
+                        Vector2Int _enemyBase = runtimeModel.RoMap.Bases[palyerID];
                     }
                 }
             }
