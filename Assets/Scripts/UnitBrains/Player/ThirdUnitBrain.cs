@@ -1,141 +1,107 @@
-using Model;
-using Model.Runtime.Projectiles;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnitBrains.Player;
 using UnityEngine;
 
 public class ThirdUnitBrain : DefaultPlayerUnitBrain
 {
+    private const float _changingTime = 0.1f;
+
     public override string TargetUnitName => "Ironclad Behemoth";
 
-    private const float OverheatTemperature = 3f;
-    private const float OverheatCooldown = 2f;
-    private float _temperature = 0f;
-    private float _cooldownTime = 0f;
-    private bool _overheated;
-    private static int unitCounter = 0;
-    private int unitNumber;
-    private const int MaxTargetsToConsider = 3;
+    private bool _isRunMode = true;
+    private bool _isAttackMode = false;
+    private bool _isChangingMode = false;
+    private float _timeBeforeChange = 0f;
 
-    protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
+    public float TimeBeforeChange
     {
-        float overheatTemperature = OverheatTemperature;
-        ///////////////////////////////////////
-        // Homework 1.3 (1st block, 3rd module)
-        ///////////////////////////////////////           
-        if (GetTemperature() >= overheatTemperature)
+        get => _timeBeforeChange;
+        set
         {
-            return;
-        }
-
-        IncreaseTemperature();
-
-
-
-
-        if (IsTargetInRange(forTarget))
-        {
-            var projectile = CreateProjectile(forTarget);
-            AddProjectileToList(projectile, intoList);
-        }
-        ///////////////////////////////////////
-    }
-
-    protected override List<Vector2Int> SelectTargets()
-    {
-        ///////////////////////////////////////
-        // Homework 1.4 (1st block, 4rd module)
-        ///////////////////////////////////////
-        List<Vector2Int> allTargets = GetReachableTargets();
-        List<Vector2Int> result = new List<Vector2Int>();
-
-        Vector2Int Target = Vector2Int.zero;
-
-        int playerID = IsPlayerUnitBrain ? RuntimeModel.PlayerId : RuntimeModel.BotPlayerId;
-        Vector2Int ownBase = runtimeModel.RoMap.Bases[playerID];
-
-        int enemyPlayerID = 1 - playerID;
-        Vector2Int enemyBase = runtimeModel.RoMap.Bases[enemyPlayerID];
-
-        if (allTargets.Count == 0)
-        {
-            result.Add(enemyBase);
-        }
-        else
-        {
-            SortByDistanceToOwnBase(allTargets);
-            unitCounter++;
-            unitNumber = unitCounter;
-            int targetIndex = unitNumber % Math.Min(allTargets.Count, MaxTargetsToConsider);
-            if (IsTargetInRange(allTargets[targetIndex]))
+            if(_timeBeforeChange != value)
             {
-                result.Add(allTargets[targetIndex]);
-            }
-        }
-
-        //Макс. значение расстояния
-        float minDistance = float.MaxValue;
-        ///////////////////////////
-        float maxProjectileRange = 10f;
-
-        foreach (Vector2Int i in GetAllTargets())
-        {
-            float distance = DistanceToOwnBase(i);
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                Target = i;
-            }
-            foreach (var target in GetAllTargets())
-            {
-                allTargets.Add(target);
-            }
-            if (minDistance < float.MaxValue)
-            {
-                if (IsTargetInRange(i))
+                if (!_isChangingMode)
                 {
-                    new List<Vector2Int>().Add(i);
+                    _isChangingMode = true;
+                    _timeBeforeChange = value;
+                    return;
+                }
+
+                if(_timeBeforeChange < 0)
+                {
+                    _isChangingMode = false;
+                    _timeBeforeChange = 0f;
+
+                    if (_isAttackMode)
+                    {
+                        _isRunMode = true;
+                        _isAttackMode = false;
+                    }
+                    else if (_isRunMode)
+                    {
+                        _isRunMode = false;
+                        _isAttackMode = true;
+                    }
                 }
                 else
                 {
-                    int palyerID = IsPlayerUnitBrain ? RuntimeModel.PlayerId : RuntimeModel.BotPlayerId;
-                    Vector2Int _enemyBase = runtimeModel.RoMap.Bases[palyerID];
+                    _timeBeforeChange = value;
                 }
             }
         }
-
-        new List<Vector2Int>().Clear();
-        new List<Vector2Int>().Add(Target);
-        return result;
     }
 
     public override void Update(float deltaTime, float time)
     {
-        if (_overheated)
+        base.Update(deltaTime, time);
+
+        if (_isChangingMode)
         {
-            _cooldownTime += Time.deltaTime;
-            float t = _cooldownTime / (OverheatCooldown / 10);
-            _temperature = Mathf.Lerp(OverheatTemperature, 0, t);
-            if (t >= 1)
-            {
-                _cooldownTime = 0;
-                _overheated = false;
-            }
+            TimeBeforeChange -= deltaTime;
         }
     }
 
-    private int GetTemperature()
+    public override Vector2Int GetNextStep()
     {
-        if (_overheated) return (int)OverheatTemperature;
-        else return (int)_temperature;
+        var nextStep = base.GetNextStep();
+
+        if (_isChangingMode)
+        {
+            return unit.Pos;
+        }
+
+        if (!_isRunMode && nextStep != unit.Pos)
+        {
+            TimeBeforeChange = _changingTime;
+        }
+
+        if (_isRunMode)
+        {
+            return nextStep;
+        }
+
+        return unit.Pos;
     }
 
-    private void IncreaseTemperature()
+    protected override List<Vector2Int> SelectTargets()
     {
-        _temperature += 1f;
-        if (_temperature >= OverheatTemperature) _overheated = true;
+        var targets =  base.SelectTargets();
+
+        if (_isChangingMode)
+        {
+            return new List<Vector2Int>();
+        }
+
+        if (targets.Count > 0 && !_isAttackMode)
+        {
+            TimeBeforeChange = _changingTime;
+        }
+
+        if (_isAttackMode)
+        {
+            return targets;
+        }
+
+        return new List<Vector2Int>();
     }
 }
-

@@ -74,7 +74,7 @@ namespace Model.Runtime
 
         private void Move()
         {
-            var targetPos = _brain.GetNextStep(position);
+            var targetPos = _brain.GetNextStep();
             var delta = targetPos - Pos;
             if (delta.sqrMagnitude > 2)
             {

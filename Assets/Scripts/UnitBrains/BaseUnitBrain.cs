@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.UnitBrains.Pathfinding;
 using Model;
 using Model.Runtime.Projectiles;
 using Model.Runtime.ReadOnly;
@@ -32,7 +32,7 @@ namespace UnitBrains
             new (-0.15f, -0.15f),
         };
 
-        public virtual Vector2Int GetNextStep(UnityEngine.UIElements.Position position)
+        public virtual Vector2Int GetNextStep()
         {
             if (HasTargetsInRange())
                 return unit.Pos;
@@ -40,7 +40,7 @@ namespace UnitBrains
             var target = runtimeModel.RoMap.Bases[
                 IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId];
 
-            _activePath = new AStarUnitPath(runtimeModel, unit.Pos, target);
+            _activePath = new AStarPath(runtimeModel, unit.Pos, target);
             return _activePath.GetNextStepFrom(unit.Pos);
         }
 
@@ -163,11 +163,6 @@ namespace UnitBrains
             }
 
             return result;
-        }
-
-        internal Vector2Int GetNextStep(object position)
-        {
-            throw new NotImplementedException();
         }
     }
 }
