@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Model.Config;
+﻿using Model.Config;
 using Model.Runtime.Projectiles;
 using Model.Runtime.ReadOnly;
+using System.Collections.Generic;
+using System.Linq;
 using UnitBrains;
 using UnitBrains.Pathfinding;
 using UnityEngine;
@@ -43,19 +43,19 @@ namespace Model.Runtime
         {
             if (IsDead)
                 return;
-            
+
             if (_nextBrainUpdateTime < time)
             {
                 _nextBrainUpdateTime = time + Config.BrainUpdateInterval;
                 _brain.Update(deltaTime, time);
             }
-            
+
             if (_nextMoveTime < time)
             {
                 _nextMoveTime = time + Config.MoveDelay;
                 Move();
             }
-            
+
             if (_nextAttackTime < time && Attack())
             {
                 _nextAttackTime = time + Config.AttackDelay;
@@ -67,7 +67,7 @@ namespace Model.Runtime
             var projectiles = _brain.GetProjectiles();
             if (projectiles == null || projectiles.Count == 0)
                 return false;
-            
+
             _pendingProjectiles.AddRange(projectiles);
             return true;
         }
@@ -87,7 +87,7 @@ namespace Model.Runtime
             {
                 return;
             }
-            
+
             Pos = targetPos;
         }
 
