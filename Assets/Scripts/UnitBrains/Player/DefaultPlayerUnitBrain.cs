@@ -1,5 +1,6 @@
-﻿using Model;
-using Model.Runtime;
+﻿using System.Collections.Generic;
+using Model;
+using Model.Runtime.Projectiles;
 using UnityEngine;
 using Utilities;
 
@@ -7,28 +8,28 @@ namespace UnitBrains.Player
 {
     public class DefaultPlayerUnitBrain : BaseUnitBrain
     {
-        public override void Update(float deltaTime, float time)
-        {
-            base.Update(deltaTime, time);
-            var recommendedTarget = UnitCoordinator.Instance.GetRecommendedTarget();
-            var recommendedPosition = UnitCoordinator.Instance.GetRecommendedPosition();
+        private PlayerUnitCoordinator _coordinator;
 
-            MoveTowards(recommendedPosition);
-            AttackTarget(recommendedTarget);
+        public void AssignCoordinator(PlayerUnitCoordinator coordinator)
+        {
+            _coordinator = coordinator;
         }
 
-        protected float DistanceToOwnBase(Vector2Int fromPos)
+        protected float DistanceToOwnBase(Vector2Int fromPos) =>
+            Vector2Int.Distance(fromPos, runtimeModel.RoMap.Bases[RuntimeModel.PlayerId]);
+
+        protected void SortByDistanceToOwnBase(List<Vector2Int> list)
         {
-            return Vector2Int.Distance(fromPos, runtimeModel.RoMap.Bases[RuntimeModel.PlayerId]);
+            list.Sort(CompareByDistanceToOwnBase);
         }
 
-        private void MoveTowards(Vector2Int targetPos)
+        private int CompareByDistanceToOwnBase(Vector2Int a, Vector2Int b)
         {
-        }
-
-        private void AttackTarget(Vector2Int targetPos)
-        {
+            var distanceA = DistanceToOwnBase(a);
+            var distanceB = DistanceToOwnBase(b);
+            return distanceA.CompareTo(distanceB);
         }
     }
 }
+
 

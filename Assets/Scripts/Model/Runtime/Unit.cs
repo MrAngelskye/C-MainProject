@@ -1,13 +1,13 @@
 ﻿using Model.Config;
 using Model.Runtime.Projectiles;
 using Model.Runtime.ReadOnly;
-using System.Collections.Generic;
-using System.Linq;
 using UnitBrains;
 using UnitBrains.Pathfinding;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Utilities;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.UIElements;
 
 namespace Model.Runtime
 {
@@ -28,6 +28,7 @@ namespace Model.Runtime
         private float _nextMoveTime = 0f;
         private float _nextAttackTime = 0f;
         private Position position;
+        private PlayerUnitCoordinator _unitCoordinator;
 
         public Unit(UnitConfig config, Vector2Int startPos)
         {
@@ -37,6 +38,13 @@ namespace Model.Runtime
             _brain = UnitBrainProvider.GetBrain(config);
             _brain.SetUnit(this);
             _runtimeModel = ServiceLocator.Get<IReadOnlyRuntimeModel>();
+        }
+
+        public BaseUnitBrain Brain => _brain;
+
+        public void AssignCoordinator(PlayerUnitCoordinator coordinator)
+        {
+            _unitCoordinator = coordinator;
         }
 
         public void Update(float deltaTime, float time)
