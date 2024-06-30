@@ -88,12 +88,19 @@ namespace Controller
             if (forPlayer == RuntimeModel.PlayerId)
             {
                 (unit.Brain as DefaultPlayerUnitBrain)?.AssignCoordinator(_playerCoordinator);
+
+
+                if (config.Name == "Buffer")
+                {
+                    (unit.Brain as DefaultPlayerUnitBrain)?.AssignCoordinator(_playerCoordinator);
+                }
             }
             else if (forPlayer == RuntimeModel.BotPlayerId)
             {
                 (unit.Brain as DefaultBotUnitBrain)?.AssignCoordinator(_botCoordinator);
             }
         }
+
 
         private void TryStartSimulation()
         {

@@ -7,6 +7,7 @@ using UnitBrains.Pathfinding;
 using UnitBrains;
 using UnityEngine;
 using Utilities;
+using System;
 
 namespace Model.Runtime
 {
@@ -19,6 +20,8 @@ namespace Model.Runtime
         public BaseUnitBrain Brain { get; private set; }
         public BaseUnitPath ActivePath => Brain?.ActivePath;
         public IReadOnlyList<BaseProjectile> PendingProjectiles => _pendingProjectiles;
+
+        public int PlayerId => throw new System.NotImplementedException();
 
         private readonly List<BaseProjectile> _pendingProjectiles = new();
         private readonly List<BuffDebuff> _buffs = new();
@@ -36,6 +39,13 @@ namespace Model.Runtime
             Brain = UnitBrainProvider.GetBrain(config);
             Brain.SetUnit(this);
             _runtimeModel = ServiceLocator.Get<IReadOnlyRuntimeModel>();
+        }
+
+        private List<BuffDebuff> _buffsDebuffs = new List<BuffDebuff>();
+
+        public bool HasBuff(string buffName)
+        {
+            return _buffsDebuffs.Exists(b => b.Name == buffName);
         }
 
         public void Update(float deltaTime, float time)
@@ -137,6 +147,11 @@ namespace Model.Runtime
         public void ApplyBuff(BuffDebuff buff)
         {
             _buffs.Add(buff);
+        }
+
+        public bool HasBuff(Type buffType)
+        {
+            throw new NotImplementedException();
         }
     }
 }
