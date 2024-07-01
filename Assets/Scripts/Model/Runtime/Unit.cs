@@ -8,6 +8,7 @@ using UnitBrains;
 using UnityEngine;
 using Utilities;
 using System;
+using BuffDebuff;
 
 namespace Model.Runtime
 {
@@ -24,13 +25,27 @@ namespace Model.Runtime
         public int PlayerId => throw new System.NotImplementedException();
 
         private readonly List<BaseProjectile> _pendingProjectiles = new();
-        private readonly List<BuffDebuff> _buffs = new();
+        private readonly List<BuffDebuff.BuffDebuff> _buffs = new();
         private IReadOnlyRuntimeModel _runtimeModel;
 
         private float _nextBrainUpdateTime = 0f;
         private float _nextMoveTime = 0f;
         private float _nextAttackTime = 0f;
+        private float _attackRange;
 
+        private bool _isDoubleShotEnabled;
+
+        public void EnableDoubleShot()
+        {
+            _isDoubleShotEnabled = true;
+        }
+
+        public void IncreaseAttackRange(float amount)
+        {
+            _attackRange += amount;
+        }
+
+        public float AttackRange => _attackRange;
         public Unit(UnitConfig config, Vector2Int startPos)
         {
             Config = config;
@@ -41,7 +56,7 @@ namespace Model.Runtime
             _runtimeModel = ServiceLocator.Get<IReadOnlyRuntimeModel>();
         }
 
-        private List<BuffDebuff> _buffsDebuffs = new List<BuffDebuff>();
+        private List<BuffDebuff.BuffDebuff> _buffsDebuffs = new List<BuffDebuff.BuffDebuff>();
 
         public bool HasBuff(string buffName)
         {
@@ -144,7 +159,7 @@ namespace Model.Runtime
             Health -= projectileDamage;
         }
 
-        public void ApplyBuff(BuffDebuff buff)
+        public void ApplyBuff(BuffDebuff.BuffDebuff buff)
         {
             _buffs.Add(buff);
         }
@@ -155,3 +170,4 @@ namespace Model.Runtime
         }
     }
 }
+

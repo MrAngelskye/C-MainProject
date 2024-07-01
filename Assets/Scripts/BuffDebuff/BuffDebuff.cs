@@ -2,19 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuffDebuff
+namespace BuffDebuff
 {
-    public float Duration { get; set; }
-    public float MoveSpeedModifier { get; set; }
-    public float AttackSpeedModifier { get; set; }
-    public string Name { get; set; }
 
-    public BuffDebuff(float duration, float moveSpeedModifier, float attackSpeedModifier, string name)
+
+    public class BuffDebuff
     {
-        Duration = duration;
-        MoveSpeedModifier = moveSpeedModifier;
-        AttackSpeedModifier = attackSpeedModifier;
-        Name = name;
+        public float Duration { get; set; }
+        public float MoveSpeedModifier { get; set; }
+        public float AttackSpeedModifier { get; set; }
+        public string Name { get; set; }
+
+        public BuffDebuff(float duration, float moveSpeedModifier, float attackSpeedModifier, string name)
+        {
+            Duration = duration;
+            MoveSpeedModifier = moveSpeedModifier;
+            AttackSpeedModifier = attackSpeedModifier;
+            Name = name;
+        }
     }
 }
 
